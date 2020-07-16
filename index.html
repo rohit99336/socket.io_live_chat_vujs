@@ -14,7 +14,29 @@
     <div id="app">
         <div class="container">
             <div class="col-lg-6 offset-lg-3 mt-3">
-                <div class="card bg-info">
+
+                <div v-if="ready">
+                    <p v-for="item in info">
+                        {{ item.name }} {{ item.type }}
+                    </p>
+                </div>
+
+                <div v-if="!ready">
+                    <h4>set your name and chat</h4>
+                    <form action="" @submit.prevent="addName">
+                        <div class="from-group row mt-3">
+                            <input type="text" name="" id="" class="form-control col-10 ml-3" v-model="name"
+                                placeholder="Give your name">
+
+                            <button type="submit" value="Add"
+                                class="btn btn-success btn-sm ml-1">&nbsp;Add&nbsp;</button>
+                        </div>
+                    </form>
+                </div>
+
+                <h6 v-else>{{ name }}</h6>
+
+                <div class="card bg-info mt-3" v-if="ready">
                     <div class="card-header text-white ">
                         Live server chat app
                     </div>
@@ -52,11 +74,14 @@
                 newmessage: null,
                 messages: [],
                 typing: false,
+                name: null,
+                ready: false,
+                info: [],
             },
 
-            watch:{
-                newmessage(value){
-                    value ? socket.emit('typing'):socket.emit('stopTyping');
+            watch: {
+                newmessage(value) {
+                    value ? socket.emit('typing') : socket.emit('stopTyping');
                 }
             },
 
@@ -68,11 +93,19 @@
                     });
                     socket.emit('chat-message', this.newmessage);
                     //this.messages = null
+                },
+                addName() {
+                    this.ready = true
+                    socket.emit('joined', this.name)
                 }
             },
 
             created() {
-                //socket.emit('Created','Rohit kumar');
+                window.onbeforeunload = () => {
+                    socket.emit('leaved',this.name)
+                }
+
+                socket.emit('Created','Rohit kumar');
                 socket.on('Created', (data) => {
                     console.log(data);
                 });
@@ -84,12 +117,20 @@
                     });
                 });
 
-                socket.on('typing',() =>{
+                socket.on('typing', () => {
                     this.typing = true
                 });
 
-                socket.on('stopTyping',() =>{
+                socket.on('stopTyping', () => {
                     this.typing = false
+                });
+
+                socket.on('joined', (data) => {
+                    this.info.push({name: data, type:'joined'})
+                });
+
+                socket.on('leaved', (data) => {
+                    this.info.push({name: data, type:'leaved'})
                 });
             },
         });
