@@ -1,0 +1,6 @@
+follow the instruction - https://socket.io/get-started/chat/
+commands - if your first time - npm install else npm -v
+            npm install express
+            npm install cors
+start for server and index page - node index.js
+    
