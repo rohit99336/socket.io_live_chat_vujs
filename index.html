@@ -127,10 +127,16 @@
 
                 socket.on('joined', (data) => {
                     this.info.push({name: data, type:'joined'})
+                    setTimeout(() =>{
+                        this.info = []
+                    }, 5000);
                 });
 
                 socket.on('leaved', (data) => {
                     this.info.push({name: data, type:'leaved'})
+                    setTimeout(() =>{
+                        this.info = []
+                    }, 5000);
                 });
             },
         });
